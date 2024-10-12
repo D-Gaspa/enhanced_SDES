@@ -1,8 +1,43 @@
-class KeyManager:
-    def generate_sdes_key(self):
-        # TODO: Generate a 10-bit key for S-DES
-        pass
+"""
+This module provides key management functionality for the enhanced_SDES project.
 
-    def generate_transposition_key(self, columns):
-        # TODO: Generate a key for columnar transposition
-        pass
+It includes a class for generating and managing keys for both the S-DES algorithm
+and the columnar transposition technique used in the enhanced version.
+"""
+
+import random
+from typing import List
+
+
+class KeyManager:
+    """
+    A class for managing encryption keys.
+
+    This class provides methods for generating keys for the S-DES algorithm
+    and the columnar transposition technique used in the enhanced version.
+    """
+
+    @staticmethod
+    def generate_sdes_key() -> str:
+        """
+        Generate a 10-bit key for S-DES.
+
+        Returns:
+            A 10-bit binary string representing the S-DES key.
+        """
+        return ''.join(random.choice('01') for _ in range(10))
+
+    @staticmethod
+    def generate_transposition_key(columns: int) -> List[int]:
+        """
+        Generate a key for columnar transposition.
+
+        Args:
+            columns: The number of columns in the transposition matrix.
+
+        Returns:
+            A list of integers representing the column order for transposition.
+        """
+        key = list(range(columns))
+        random.shuffle(key)
+        return key
