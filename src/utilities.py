@@ -5,7 +5,7 @@ It includes functions for text-to-binary conversion, binary-to-text conversion,
 splitting data into blocks, and a decorator for showing progress of operations.
 """
 
-from typing import List, Callable, Any
+from typing import Callable, Any
 
 
 class Utilities:
@@ -43,18 +43,30 @@ class Utilities:
         return ''.join(chr(int(binary[i:i + 8], 2)) for i in range(0, len(binary), 8))
 
     @staticmethod
-    def split_into_blocks(data: str, block_size: int) -> List[str]:
+    def binary_to_hex(binary: str) -> str:
         """
-        Split a string into blocks of a specified size.
+        Convert a binary string to its hexadecimal representation.
 
         Args:
-            data:       The input string to be split.
-            block_size: The size of each block.
+            binary: The binary string to be converted.
 
         Returns:
-            A list of blocks, each of the specified size.
+            The hexadecimal representation of the input binary string.
         """
-        return [data[i:i + block_size] for i in range(0, len(data), block_size)]
+        return hex(int(binary, 2))[2:].upper().zfill(len(binary) // 4)
+
+    @staticmethod
+    def hex_to_binary(hex_string: str) -> str:
+        """
+        Convert a hexadecimal string to its binary representation.
+
+        Args:
+            hex_string: The hexadecimal string to be converted.
+
+        Returns:
+            The binary representation of the input hexadecimal string.
+        """
+        return bin(int(hex_string, 16))[2:].zfill(len(hex_string) * 4)
 
 
 def show_progress(func: Callable[..., Any]) -> Callable[..., Any]:

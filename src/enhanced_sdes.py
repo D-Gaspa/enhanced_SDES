@@ -67,7 +67,7 @@ class EnhancedSDES:
         binary = Utilities.text_to_binary(shifted)
         encrypted_binary = self._apply_sdes(binary, sdes_key, encrypt=True)
 
-        return Utilities.binary_to_text(encrypted_binary)
+        return Utilities.binary_to_hex(encrypted_binary)
 
     @show_progress
     def decrypt(self, ciphertext: str, sdes_key: str, trans_key: List[int], rounds: int) -> str:
@@ -84,7 +84,7 @@ class EnhancedSDES:
             The decrypted plaintext.
         """
         # Step 1: S-DES Decryption
-        binary = Utilities.text_to_binary(ciphertext)
+        binary = Utilities.hex_to_binary(ciphertext)
         decrypted_binary = self._apply_sdes(binary, sdes_key, encrypt=False)
         text = Utilities.binary_to_text(decrypted_binary)
 

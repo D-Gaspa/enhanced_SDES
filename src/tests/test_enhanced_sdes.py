@@ -27,10 +27,15 @@ class TestUtilities(unittest.TestCase):
         self.assertEqual(Utilities.binary_to_text("0100000101000010"), "AB")
         self.assertEqual(Utilities.binary_to_text("0100100001100101011011000110110001101111"), "Hello")
 
-    def test_split_into_blocks(self):
-        self.assertEqual(Utilities.split_into_blocks("ABCDEF", 2), ["AB", "CD", "EF"])
-        self.assertEqual(Utilities.split_into_blocks("ABCDE", 2), ["AB", "CD", "E"])
-        self.assertEqual(Utilities.split_into_blocks("010101", 3), ["010", "101"])
+    def test_binary_to_hex(self):
+        self.assertEqual(Utilities.binary_to_hex("01000001"), "41")
+        self.assertEqual(Utilities.binary_to_hex("0100000101000010"), "4142")
+        self.assertEqual(Utilities.binary_to_hex("0100100001100101011011000110110001101111"), "48656C6C6F")
+
+    def test_hex_to_binary(self):
+        self.assertEqual(Utilities.hex_to_binary("41"), "01000001")
+        self.assertEqual(Utilities.hex_to_binary("4142"), "0100000101000010")
+        self.assertEqual(Utilities.hex_to_binary("48656C6C6F"), "0100100001100101011011000110110001101111")
 
     def test_text_to_binary_and_back(self):
         original_text = "Hello, World!"
@@ -372,6 +377,24 @@ class TestEnhancedSDES(unittest.TestCase):
         ciphertext1 = self.esdes.encrypt(plaintext, sdes_key, trans_key, rounds)
         ciphertext2 = self.esdes.encrypt(plaintext, sdes_key, trans_key, rounds)
         self.assertEqual(ciphertext1, ciphertext2)
+
+    def test_correct_hex_output(self):
+        plaintext = "DIDYOUSEE"
+        sdes_key = "0010010111"
+        rounds = 2
+
+        expected_ciphertext = "CF4A218C4C8C7C827C"
+        ciphertext = self.esdes.encrypt(plaintext, sdes_key, [3, 1, 2], rounds)
+        self.assertEqual(ciphertext, expected_ciphertext)
+
+    def test_correct_decryption_with_hex_input(self):
+        ciphertext = "CF4A218C4C8C7C827C"
+        sdes_key = "0010010111"
+        rounds = 2
+
+        expected_plaintext = "DIDYOUSEE"
+        plaintext = self.esdes.decrypt(ciphertext, sdes_key, [3, 1, 2], rounds)
+        self.assertEqual(plaintext, expected_plaintext)
 
 
 if __name__ == '__main__':
