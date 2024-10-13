@@ -16,6 +16,9 @@ class KeyManager:
     This class provides methods for generating keys for the S-DES algorithm
     and the columnar transposition technique used in the enhanced version.
     """
+    MIN_COLUMNS = 2
+    MAX_COLUMNS = 26  # Maximum number of columns (alphabet size)
+    DEFAULT_COLUMNS = 3
 
     @staticmethod
     def generate_sdes_key() -> str:
@@ -28,7 +31,7 @@ class KeyManager:
         return ''.join(random.choice('01') for _ in range(10))
 
     @staticmethod
-    def generate_transposition_key(columns: int) -> List[int]:
+    def generate_transposition_key(columns: int = DEFAULT_COLUMNS) -> List[int]:
         """
         Generate a key for columnar transposition.
 
@@ -38,6 +41,9 @@ class KeyManager:
         Returns:
             A list of integers representing the column order for transposition.
         """
-        key = list(range(columns))
+        if columns < KeyManager.MIN_COLUMNS or columns > KeyManager.MAX_COLUMNS:
+            raise ValueError(f"Number of columns must be between {KeyManager.MIN_COLUMNS} and {KeyManager.MAX_COLUMNS}")
+
+        key = list(range(1, columns + 1))  # Generate key in base 1
         random.shuffle(key)
         return key

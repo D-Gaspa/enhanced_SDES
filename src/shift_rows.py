@@ -5,76 +5,66 @@ It provides a class that encapsulates the shift and inverse shift operations
 used in the enhanced version of the Simplified Data Encryption Standard (S-DES).
 """
 
+from math import ceil
+
 
 class ShiftRows:
     """
     A class implementing the Shift Rows operation.
 
-    This class provides methods for shifting rows of a 3x3 matrix of characters,
+    This class provides methods for shifting rows of a matrix of characters,
     as well as the inverse operation.
-    It is used as part of the enhanced S-DES algorithm.
+    It is used as part of the enhanced S-DES algorithm and can handle matrices of various sizes.
     """
 
     @staticmethod
-    def shift(text: str) -> str:
+    def shift(text: str, num_columns: int) -> str:
         """
         Perform the Shift Rows operation on the input text.
 
-        The operation shifts the rows of a 3x3 matrix as follows:
+        The operation shifts rows as follows:
         - First row: no shift
         - Second row: shift one position to the left
         - Third row: shift two positions to the left
+        - And so on for any additional rows
 
         Args:
-            text: A string of nine characters to be arranged in a 3x3 matrix and shifted.
+            text: A string of characters to be arranged in a matrix and shifted.
+            num_columns: The number of columns in the matrix.
 
         Returns:
-            A string of nine characters after the shift operation.
-
-        Raises:
-            ValueError: If the input text is not exactly nine characters long.
+            A string of characters after the shift operation.
         """
-        if len(text) != 9:
-            raise ValueError("Input text must be exactly 9 characters long")
+        num_rows = ceil(len(text) / num_columns)
+        matrix = [list(text[i:i + num_columns].ljust(num_columns)) for i in range(0, len(text), num_columns)]
 
-        matrix = [list(text[i:i + 3]) for i in range(0, 9, 3)]
+        for i in range(1, num_rows):
+            matrix[i] = matrix[i][i:] + matrix[i][:i]
 
-        # Shift second row
-        matrix[1] = matrix[1][1:] + [matrix[1][0]]
-
-        # Shift third row
-        matrix[2] = matrix[2][2:] + matrix[2][:2]
-
-        return ''.join(''.join(row) for row in matrix)
+        return ''.join(''.join(row).rstrip() for row in matrix)
 
     @staticmethod
-    def inverse_shift(text: str) -> str:
+    def inverse_shift(text: str, num_columns: int) -> str:
         """
         Perform the inverse Shift Rows operation on the input text.
 
-        The operation shifts the rows of a 3x3 matrix as follows:
+        The operation shifts rows as follows:
         - First row: no shift
         - Second row: shift one position to the right
         - Third row: shift two positions to the right
+        - And so on for any additional rows
 
         Args:
-            text: A string of nine characters to be arranged in a 3x3 matrix and inverse shifted.
+            text: A string of characters to be arranged in a matrix and inverse shifted.
+            num_columns: The number of columns in the matrix.
 
         Returns:
-            A string of nine characters after the inverse shift operation.
-
-        Raises:
-            ValueError: If the input text is not exactly nine characters long.
+            A string of characters after the inverse shift operation.
         """
-        if len(text) != 9:
-            raise ValueError("Input text must be exactly 9 characters long")
+        num_rows = ceil(len(text) / num_columns)
+        matrix = [list(text[i:i + num_columns].ljust(num_columns)) for i in range(0, len(text), num_columns)]
 
-        matrix = [list(text[i:i + 3]) for i in range(0, 9, 3)]
+        for i in range(1, num_rows):
+            matrix[i] = matrix[i][-i:] + matrix[i][:-i]
 
-        # Inverse shift second row
-        matrix[1] = [matrix[1][-1]] + matrix[1][:-1]
-
-        # Inverse shift third row
-        matrix[2] = matrix[2][-2:] + matrix[2][:-2]
-
-        return ''.join(''.join(row) for row in matrix)
+        return ''.join(''.join(row).rstrip() for row in matrix)

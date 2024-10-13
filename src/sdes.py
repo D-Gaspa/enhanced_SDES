@@ -27,25 +27,14 @@ class SDES:
         S1:     S-Box 1
     """
 
-    # Permutation tables and S-boxes for S-DES
     IP = [2, 6, 3, 1, 4, 8, 5, 7]
     IP_INV = [4, 1, 3, 5, 7, 2, 8, 6]
     EP = [4, 1, 2, 3, 2, 3, 4, 1]
     P4 = [2, 4, 3, 1]
     P10 = [3, 5, 2, 7, 4, 10, 1, 9, 8, 6]
     P8 = [6, 3, 7, 4, 8, 5, 10, 9]
-    S0 = [
-        [1, 0, 3, 2],
-        [3, 2, 1, 0],
-        [0, 2, 1, 3],
-        [3, 1, 3, 2]
-    ]
-    S1 = [
-        [0, 1, 2, 3],
-        [2, 0, 1, 3],
-        [3, 0, 1, 0],
-        [2, 1, 0, 3]
-    ]
+    S0 = [[1, 0, 3, 2], [3, 2, 1, 0], [0, 2, 1, 3], [3, 1, 3, 2]]
+    S1 = [[0, 1, 2, 3], [2, 0, 1, 3], [3, 0, 1, 0], [2, 1, 0, 3]]
 
     def encrypt(self, plaintext: str, key: str) -> str:
         """
@@ -85,12 +74,22 @@ class SDES:
         Returns:
             An 8-bit binary string representing the result of encryption or decryption.
         """
-        k1, k2 = self.generate_subkeys(key)
-        ip_out = self._permute(text, self.IP)
-        fk1_out = self._fk(ip_out, k1 if encrypt else k2)
-        sw_out = self._switch(fk1_out)
-        fk2_out = self._fk(sw_out, k2 if encrypt else k1)
-        return self._permute(fk2_out, self.IP_INV)
+        subkey1, subkey2 = self.generate_subkeys(key)
+
+        permuted_text = self._permute(text, self.IP)
+
+        # First round
+        first_round_key = subkey1 if encrypt else subkey2
+        first_round_output = self._round_function(permuted_text, first_round_key)
+
+        switched_halves = self._switch(first_round_output)
+
+        # Second round
+        second_round_key = subkey2 if encrypt else subkey1
+        second_round_output = self._round_function(switched_halves, second_round_key)
+
+        final_permutation = self._permute(second_round_output, self.IP_INV)
+        return final_permutation
 
     def generate_subkeys(self, key: str) -> Tuple[str, str]:
         """
@@ -102,31 +101,40 @@ class SDES:
         Returns:
             A tuple containing two 8-bit binary strings (K1, K2).
         """
-        p10_out = self._permute(key, self.P10)
-        ls1_out = self._left_shift(p10_out[:5], 1) + self._left_shift(p10_out[5:], 1)
-        k1 = self._permute(ls1_out, self.P8)
-        ls2_out = self._left_shift(ls1_out[:5], 2) + self._left_shift(ls1_out[5:], 2)
-        k2 = self._permute(ls2_out, self.P8)
-        return k1, k2
+        permuted_10bit_key = self._permute(key, self.P10)
 
-    def _fk(self, input_bits: str, subkey: str) -> str:
+        left_half, right_half = permuted_10bit_key[:5], permuted_10bit_key[5:]
+
+        shifted_for_k1 = self._left_shift(left_half, 1) + self._left_shift(right_half, 1)
+        subkey1 = self._permute(shifted_for_k1, self.P8)
+
+        shifted_for_k2 = self._left_shift(left_half, 3) + self._left_shift(right_half, 3)
+        subkey2 = self._permute(shifted_for_k2, self.P8)
+
+        return subkey1, subkey2
+
+    def _round_function(self, input_bits: str, subkey: str) -> str:
         """
-        Perform the fK function of S-DES.
+        Perform one round of the S-DES algorithm (the fK function).
 
         Args:
             input_bits: An 8-bit binary string.
             subkey:     An 8-bit binary string subkey.
 
         Returns:
-            An 8-bit binary string after applying the fK function.
+            An 8-bit binary string after applying the round function.
         """
-        l, r = input_bits[:4], input_bits[4:]
-        ep_out = self._permute(r, self.EP)
-        xor_out = self._xor(ep_out, subkey)
-        s0_out = self._sbox(xor_out[:4], self.S0)
-        s1_out = self._sbox(xor_out[4:], self.S1)
-        p4_out = self._permute(s0_out + s1_out, self.P4)
-        return self._xor(l, p4_out) + r
+        left_half, right_half = input_bits[:4], input_bits[4:]
+        expanded_right_half = self._permute(right_half, self.EP)
+        xored_with_key = self._xor(expanded_right_half, subkey)
+
+        s0_output = self._sbox(xored_with_key[:4], self.S0)
+        s1_output = self._sbox(xored_with_key[4:], self.S1)
+        sbox_combined_output = s0_output + s1_output
+
+        permuted_sbox_output = self._permute(sbox_combined_output, self.P4)
+        new_left_half = self._xor(left_half, permuted_sbox_output)
+        return new_left_half + right_half
 
     @staticmethod
     def _permute(bits: str, table: List[int]) -> str:

@@ -61,7 +61,7 @@ class EnhancedSDES:
         transposed = self.transposition.transpose(plaintext, trans_key, rounds)
 
         # Step 2: Shift Rows
-        shifted = self._apply_shift_rows(transposed)
+        shifted = self.shift_rows.shift(transposed, len(trans_key))
 
         # Step 3: S-DES Encryption
         binary = Utilities.text_to_binary(shifted)
@@ -89,30 +89,10 @@ class EnhancedSDES:
         text = Utilities.binary_to_text(decrypted_binary)
 
         # Step 2: Inverse Shift Rows
-        unshifted = self._apply_shift_rows(text, inverse=True)
+        unshifted = self.shift_rows.inverse_shift(text, len(trans_key))
 
         # Step 3: Inverse Columnar Transposition
         return self.transposition.inverse_transpose(unshifted, trans_key, rounds)
-
-    def _apply_shift_rows(self, text: str, inverse: bool = False) -> str:
-        """
-        Apply the Shift Rows operation to the text.
-
-        Args:
-            text:       The text to be processed.
-            inverse:    If True, apply the inverse shift operation.
-
-        Returns:
-            The text after applying the shift rows operation.
-        """
-        result = ""
-        for i in range(0, len(text), 9):
-            block = text[i:i + 9]
-            if inverse:
-                result += self.shift_rows.inverse_shift(block)
-            else:
-                result += self.shift_rows.shift(block)
-        return result
 
     def _apply_sdes(self, binary: str, key: str, encrypt: bool) -> str:
         """
