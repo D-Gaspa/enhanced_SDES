@@ -5,15 +5,13 @@ It includes functions for text-to-binary conversion, binary-to-text conversion,
 splitting data into blocks, and a decorator for showing progress of operations.
 """
 
-from typing import Callable, Any
-
 
 class Utilities:
     """
     A utility class providing static methods for various data manipulations.
 
     This class contains methods for converting between a text and binary representations,
-    splitting data into blocks, and other utility functions used throughout the project.
+    as well as between binary and hexadecimal representations.
     """
 
     @staticmethod
@@ -68,36 +66,3 @@ class Utilities:
         """
         return bin(int(hex_string, 16))[2:].zfill(len(hex_string) * 4)
 
-
-def show_progress(func: Callable[..., Any]) -> Callable[..., Any]:
-    """
-    A decorator to optionally show the progress of a function.
-
-    This decorator will print the function name and its result if the
-    'show_progress' attribute of the class instance is True.
-
-    Args:
-        func: The function to be decorated.
-
-    Returns:
-        The wrapped function.
-    """
-
-    def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
-        """
-        Wrapper function that adds progress reporting to the decorated function.
-
-        Args:
-            self:       The instance of the class (if it's a method).
-            *args:      Positional arguments passed to the decorated function.
-            **kwargs:   Keyword arguments passed to the decorated function.
-
-        Returns:
-            The result of the decorated function.
-        """
-        result = func(self, *args, **kwargs)
-        if self.show_progress:
-            print(f"{func.__name__}: {result}")
-        return result
-
-    return wrapper

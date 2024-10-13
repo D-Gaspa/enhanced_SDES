@@ -53,17 +53,24 @@ class UserInterface:
         """
         Guide the user through the encryption process.
         """
-        message = input("Enter the message to encrypt: ")
+        while True:
+            message = input("Enter the message to encrypt: ")
+            if message:
+                break
+            print("Message cannot be empty. Please try again.")
+
         sdes_key = self._get_sdes_key()
         trans_key, column_size = self._get_transposition_key()
-        rounds = int(input("Enter the number of transposition rounds: "))
+
+        rounds = int(input("Enter the number of transposition rounds (or press Enter for default 2): ") or 2)
+
         show_progress = input("Show encryption progress? (y/n): ").lower() == 'y'
         print("Encrypting ...\n")
 
         self.enhanced_sdes.show_progress = show_progress
         ciphertext = self.enhanced_sdes.encrypt(message, sdes_key, trans_key, rounds)
 
-        print(f"Encrypted message (hex): {ciphertext}")
+        print(f"\nEncrypted message (hex): {ciphertext}")
         self._save_info(message, ciphertext, sdes_key, trans_key, column_size, rounds)
 
     def _decrypt_process(self) -> None:
@@ -98,48 +105,135 @@ class UserInterface:
         Returns:
             The 10-bit S-DES key.
         """
-        sdes_key = input("Enter the 10-bit S-DES key (or press Enter to generate): ")
-        if not sdes_key:
-            sdes_key = self.key_manager.generate_sdes_key()
-            print(f"Generated S-DES key: {sdes_key}")
-        return sdes_key
+        while True:
+            sdes_key = input("Enter the 10-bit S-DES key (or press Enter to generate): ")
+            if not sdes_key:
+                sdes_key = self.key_manager.generate_sdes_key()
+                print(f"Generated S-DES key: {sdes_key}")
+                return sdes_key
+
+            if self._validate_sdes_key(sdes_key):
+                return sdes_key
+            print("Invalid S-DES key. Please try again.")
+
+    @staticmethod
+    def _validate_sdes_key(key: str) -> bool:
+        """
+        Validate the S-DES key.
+
+        Args:
+            key: The S-DES key to validate.
+
+        Returns:
+            True if the key is valid, False otherwise.
+        """
+        return len(key) == 10 and all(bit in '01' for bit in key)
 
     def _get_transposition_key(self) -> Tuple[List[int], int]:
         """
         Get or generate the transposition key.
 
-        Accepts the following formats:
-        - Space-separated: 1 2 3
-        - Comma-separated (with or without spaces): 1,2,3 or 1, 2, 3
-        - List format (with or without spaces): [1,2,3] or [1, 2, 3]
-
         Returns:
             A tuple containing the transposition key as a list of integers and the column size.
         """
-        print("Enter the transposition key in one of the following formats:")
-        print("- Space-separated: 1 2 3")
-        print("- Comma-separated: 1,2,3")
-        print("- List format: [1,2,3]")
-        trans_key_input = input("Enter the transposition key (or press Enter to generate): ")
-        if trans_key_input:
-            trans_key_input = trans_key_input.strip('[]')
+        trans_key_input = input(
+            "Enter the transposition key (space/comma-separated or [list] format, or press Enter to generate): "
+        )
 
-            if ',' in trans_key_input:
-                # Comma-separated format
-                trans_key = [int(k.strip()) for k in trans_key_input.split(',')]
-            else:
-                # Space-separated format
-                trans_key = [int(k) for k in trans_key_input.split()]
+        if not trans_key_input:
+            return self._generate_transposition_key()
 
-            column_size = len(trans_key)
-            print(f"Transposition key accepted: {trans_key}")
-        else:
-            column_size_input = input("Enter column size (2-26, or press Enter for default): ")
-            column_size = int(column_size_input) if column_size_input else 5
-            trans_key = self.key_manager.generate_transposition_key(column_size)
-            print(f"Generated transposition key: {trans_key}")
+        return self._parse_transposition_key(trans_key_input)
+
+    def _generate_transposition_key(self) -> Tuple[List[int], int]:
+        """
+        Generate a transposition key based on user input or default value.
+
+        Returns:
+            A tuple containing the generated transposition key and column size.
+        """
+        column_size = self._get_column_size()
+        trans_key = self.key_manager.generate_transposition_key(column_size)
+        print(f"Generated transposition key: {trans_key}")
 
         return trans_key, column_size
+
+    @staticmethod
+    def _get_column_size() -> int:
+        """
+        Get the column size from user input or use the default value.
+
+        Returns:
+            The column size as an integer.
+
+        Raises:
+            ValueError: If the input is invalid.
+        """
+        while True:
+            column_size_input = input("Enter column size (2-26, or press Enter for default): ")
+            if not column_size_input:
+                return 3
+            try:
+                column_size = int(column_size_input)
+                if 2 <= column_size <= 26:
+                    return column_size
+                print("Column size must be between 2 and 26. Please try again.")
+
+            except ValueError:
+                print("Invalid input. Please enter a number between 2 and 26.")
+
+    def _parse_transposition_key(self, key_input: str) -> Tuple[List[int], int]:
+        """
+        Parse the user-provided transposition key.
+
+        Args:
+            key_input: The user input string containing the transposition key.
+
+        Returns:
+            A tuple containing the parsed transposition key and column size.
+
+        Raises:
+            ValueError: If the key is invalid.
+        """
+        key_input = key_input.strip('[]')
+
+        try:
+            if ',' in key_input:
+                trans_key = [int(k.strip()) for k in key_input.split(',')]
+            else:
+                trans_key = [int(k) for k in key_input.split()]
+
+            if self._validate_transposition_key(trans_key):
+                print(f"Transposition key accepted: {trans_key}")
+                return trans_key, len(trans_key)
+
+            raise ValueError("Invalid transposition key.")
+
+        except ValueError as e:
+            print(f"Invalid input: {e}. Please try again.")
+            return self._get_transposition_key()
+
+    @staticmethod
+    def _validate_transposition_key(trans_key: List[int]) -> bool:
+        """
+        Validate the transposition key for uniqueness and completeness.
+
+        Args:
+            trans_key: The transposition key as a list of integers.
+
+        Returns:
+            True if the key is valid, False otherwise.
+        """
+        if not (2 <= len(trans_key) <= 26):
+            return False
+
+        if len(set(trans_key)) != len(trans_key):
+            return False
+
+        if set(trans_key) != set(range(1, len(trans_key) + 1)):
+            return False
+
+        return True
 
     def _save_info(
             self,
