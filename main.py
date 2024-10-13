@@ -4,7 +4,7 @@ Main entry point for the Enhanced S-DES encryption system.
 This script initializes and runs the user interface for the encryption system.
 """
 
-from user_interface import UserInterface
+from ui.user_interface import UserInterface
 
 
 def main() -> None:

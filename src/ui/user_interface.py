@@ -7,8 +7,8 @@ and manages the interaction with the EnhancedSDES class.
 
 from typing import List, Tuple
 
-from enhanced_sdes import EnhancedSDES
-from key_manager import KeyManager
+from core.enhanced_sdes import EnhancedSDES
+from utils.key_manager import KeyManager
 
 
 class UserInterface:

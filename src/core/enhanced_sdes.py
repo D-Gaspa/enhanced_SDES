@@ -8,11 +8,11 @@ encryption scheme.
 
 from typing import List
 
-from column_transposition import ColumnTransposition
-from key_manager import KeyManager
-from sdes import SDES
-from shift_rows import ShiftRows
-from utilities import Utilities
+from core.column_transposition import ColumnTransposition
+from core.sdes import SDES
+from core.shift_rows import ShiftRows
+from utils.key_manager import KeyManager
+from utils.utilities import Utilities
 
 
 class EnhancedSDES:
