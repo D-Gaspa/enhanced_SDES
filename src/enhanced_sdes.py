@@ -12,7 +12,7 @@ from column_transposition import ColumnTransposition
 from key_manager import KeyManager
 from sdes import SDES
 from shift_rows import ShiftRows
-from utilities import Utilities, show_progress
+from utilities import Utilities
 
 
 class EnhancedSDES:
@@ -43,7 +43,6 @@ class EnhancedSDES:
         self.sdes = SDES()
         self.key_manager = KeyManager()
 
-    @show_progress
     def encrypt(self, plaintext: str, sdes_key: str, trans_key: List[int], rounds: int) -> str:
         """
         Encrypt the plaintext using the Enhanced S-DES algorithm.
@@ -59,17 +58,24 @@ class EnhancedSDES:
         """
         # Step 1: Columnar Transposition
         transposed = self.transposition.transpose(plaintext, trans_key, rounds)
+        if self.show_progress:
+            print(f"Columnar Transposition: {transposed}")
 
         # Step 2: Shift Rows
         shifted = self.shift_rows.shift(transposed, len(trans_key))
+        if self.show_progress:
+            print(f"Shift Rows: {shifted}")
 
         # Step 3: S-DES Encryption
         binary = Utilities.text_to_binary(shifted)
         encrypted_binary = self._apply_sdes(binary, sdes_key, encrypt=True)
 
-        return Utilities.binary_to_hex(encrypted_binary)
+        cipher_text = Utilities.binary_to_hex(encrypted_binary)
+        if self.show_progress:
+            print(f"S-DES Encryption: {cipher_text}")
 
-    @show_progress
+        return cipher_text
+
     def decrypt(self, ciphertext: str, sdes_key: str, trans_key: List[int], rounds: int) -> str:
         """
         Decrypt the ciphertext using the Enhanced S-DES algorithm.
@@ -87,12 +93,18 @@ class EnhancedSDES:
         binary = Utilities.hex_to_binary(ciphertext)
         decrypted_binary = self._apply_sdes(binary, sdes_key, encrypt=False)
         text = Utilities.binary_to_text(decrypted_binary)
+        if self.show_progress:
+            print(f"S-DES Decryption: {text}")
 
         # Step 2: Inverse Shift Rows
         unshifted = self.shift_rows.inverse_shift(text, len(trans_key))
+        if self.show_progress:
+            print(f"Inverse Shift Rows: {unshifted}")
 
         # Step 3: Inverse Columnar Transposition
-        return self.transposition.inverse_transpose(unshifted, trans_key, rounds)
+        plaintext = self.transposition.inverse_transpose(unshifted, trans_key, rounds)
+
+        return plaintext
 
     def _apply_sdes(self, binary: str, key: str, encrypt: bool) -> str:
         """
