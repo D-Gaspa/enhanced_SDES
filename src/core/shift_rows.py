@@ -60,12 +60,12 @@ class ShiftRows:
 
         if self.progress_level == ProgressLevel.DETAILED:
             print("Before Shift:")
-            print(Utilities.create_table(''.join(''.join(row).rstrip() for row in matrix), num_columns))
+            print(Utilities.create_table(''.join(''.join(row) for row in matrix), num_columns))
 
         for i in range(1, num_rows):
             matrix[i] = matrix[i][i:] + matrix[i][:i]
 
-        result = ''.join(''.join(row).rstrip() for row in matrix)
+        result = ''.join(''.join(row) for row in matrix)
 
         if self.progress_level == ProgressLevel.DETAILED:
             print("After Shift:")
@@ -95,12 +95,12 @@ class ShiftRows:
 
         if self.progress_level == ProgressLevel.DETAILED:
             print("Before Inverse Shift:")
-            print(Utilities.create_table(''.join(''.join(row).rstrip() for row in matrix), num_columns))
+            print(Utilities.create_table(''.join(''.join(row) for row in matrix), num_columns))
 
         for i in range(1, num_rows):
             matrix[i] = matrix[i][-i:] + matrix[i][:-i]
 
-        result = ''.join(''.join(row).rstrip() for row in matrix)
+        result = ''.join(''.join(row) for row in matrix)
 
         if self.progress_level == ProgressLevel.DETAILED:
             print("After Inverse Shift:")

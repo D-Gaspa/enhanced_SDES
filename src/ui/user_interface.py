@@ -185,7 +185,7 @@ class UserInterface:
             ValueError: If the input is invalid.
         """
         while True:
-            column_size_input = input("Enter column size (2-26, or press Enter for default): ")
+            column_size_input = input("Enter column size (2-26, or press Enter for default 3): ")
             if not column_size_input:
                 return 3
             try:

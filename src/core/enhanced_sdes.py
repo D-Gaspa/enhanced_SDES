@@ -73,12 +73,12 @@ class EnhancedSDES:
         # Step 1: Columnar Transposition
         transposed = self.transposition.transpose(plaintext, trans_key, rounds)
         if self.progress_level != ProgressLevel.NONE:
-            print(f"\nColumnar Transposition: {transposed}")
+            print(f"\nColumnar Transposition: \"{transposed}\"")
 
         # Step 2: Shift Rows
         shifted = self.shift_rows.shift(transposed, len(trans_key))
         if self.progress_level != ProgressLevel.NONE:
-            print(f"\nShift Rows: {shifted}")
+            print(f"\nShift Rows: \"{shifted}\"")
 
         # Step 3: S-DES Encryption
         binary = Utilities.text_to_binary(shifted)
@@ -121,17 +121,17 @@ class EnhancedSDES:
 
         text = Utilities.binary_to_text(decrypted_binary)
         if self.progress_level != ProgressLevel.NONE:
-            print(f"\nConverted to text: {text}")
+            print(f"\nConverted to text: \"{text}\"")
 
         # Step 2: Inverse Shift Rows
         unshifted = self.shift_rows.inverse_shift(text, len(trans_key))
         if self.progress_level != ProgressLevel.NONE:
-            print(f"\nInverse Shift Rows: {unshifted}\n")
+            print(f"\nInverse Shift Rows: \"{unshifted}\"\n")
 
         # Step 3: Inverse Columnar Transposition
         plaintext = self.transposition.inverse_transpose(unshifted, trans_key, rounds)
 
-        return plaintext
+        return plaintext.rstrip()
 
     def _apply_sdes(self, binary: str, key: str, encrypt: bool) -> str:
         """

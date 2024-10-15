@@ -20,8 +20,6 @@ class ColumnTransposition:
     It supports multiple rounds of transposition for increased security.
 
     Attributes:
-        ALPHABET: A string containing the uppercase alphabet.
-
         progress_level: The level of detail to show during the transposition process.
     """
     ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -110,7 +108,7 @@ class ColumnTransposition:
         text = ''.join(text.split()).upper()  # Remove spaces and convert to uppercase
         padding_length = -len(text) % num_columns
         if padding_length > 0:
-            padding = ColumnTransposition.ALPHABET[-padding_length:]
+            padding = ' ' * padding_length
             text += padding
         return text
 
