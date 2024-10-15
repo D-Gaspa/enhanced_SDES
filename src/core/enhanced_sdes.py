@@ -56,15 +56,18 @@ class EnhancedSDES:
         Returns:
             The encrypted ciphertext.
         """
-        # Step 1: Columnar Transposition
-        transposed = self.transposition.transpose(plaintext, trans_key, rounds)
         if self.show_progress:
-            print(f"Columnar Transposition: {transposed}")
+            print(f"Plaintext: {plaintext}\n")
+
+        # Step 1: Columnar Transposition
+        transposed = self.transposition.transpose(plaintext, trans_key, rounds, show_progress=self.show_progress)
+        if self.show_progress:
+            print(f"\nColumnar Transposition: {transposed}")
 
         # Step 2: Shift Rows
-        shifted = self.shift_rows.shift(transposed, len(trans_key))
+        shifted = self.shift_rows.shift(transposed, len(trans_key), show_progress=self.show_progress)
         if self.show_progress:
-            print(f"Shift Rows: {shifted}")
+            print(f"\nShift Rows: {shifted}")
 
         # Step 3: S-DES Encryption
         binary = Utilities.text_to_binary(shifted)
@@ -72,7 +75,7 @@ class EnhancedSDES:
 
         cipher_text = Utilities.binary_to_hex(encrypted_binary)
         if self.show_progress:
-            print(f"S-DES Encryption: {cipher_text}")
+            print(f"\nS-DES Encryption: {cipher_text}\n")
 
         return cipher_text
 
@@ -89,20 +92,23 @@ class EnhancedSDES:
         Returns:
             The decrypted plaintext.
         """
+        if self.show_progress:
+            print(f"Ciphertext: {ciphertext}")
+
         # Step 1: S-DES Decryption
         binary = Utilities.hex_to_binary(ciphertext)
         decrypted_binary = self._apply_sdes(binary, sdes_key, encrypt=False)
         text = Utilities.binary_to_text(decrypted_binary)
         if self.show_progress:
-            print(f"S-DES Decryption: {text}")
+            print(f"\nS-DES Decryption: {text}")
 
         # Step 2: Inverse Shift Rows
-        unshifted = self.shift_rows.inverse_shift(text, len(trans_key))
+        unshifted = self.shift_rows.inverse_shift(text, len(trans_key), show_progress=self.show_progress)
         if self.show_progress:
-            print(f"Inverse Shift Rows: {unshifted}")
+            print(f"\nInverse Shift Rows: {unshifted}\n")
 
         # Step 3: Inverse Columnar Transposition
-        plaintext = self.transposition.inverse_transpose(unshifted, trans_key, rounds)
+        plaintext = self.transposition.inverse_transpose(unshifted, trans_key, rounds, show_progress=self.show_progress)
 
         return plaintext
 

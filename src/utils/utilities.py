@@ -4,14 +4,18 @@ This module provides utility functions and classes for the enhanced_SDES project
 It includes functions for text-to-binary conversion, binary-to-text conversion,
 splitting data into blocks, and a decorator for showing progress of operations.
 """
+import math
+
+from tabulate import tabulate
 
 
 class Utilities:
     """
     A utility class providing static methods for various data manipulations.
 
-    This class contains methods for converting between a text and binary representations,
-    as well as between binary and hexadecimal representations.
+    This class contains methods for converting between text and binary representations,
+    between binary and hexadecimal representations, and for creating tabular
+    representations of data.
     """
 
     @staticmethod
@@ -66,3 +70,26 @@ class Utilities:
         """
         return bin(int(hex_string, 16))[2:].zfill(len(hex_string) * 4)
 
+    @staticmethod
+    def create_table(text: str, num_columns: int) -> str:
+        """
+        Create a tabular representation of the text.
+
+        Args:
+            text:           The text to be represented in a table.
+            num_columns:    The number of columns in the table.
+
+        Returns:
+            A string representation of the table.
+        """
+
+        num_rows = math.ceil(len(text) / num_columns)
+        table = []
+
+        for i in range(num_rows):
+            row = list(text[i * num_columns: (i + 1) * num_columns])
+            row += [''] * (num_columns - len(row))  # Pad with empty strings if necessary
+            table.append(row)
+
+        headers = [f"Col {i + 1}" for i in range(num_columns)]
+        return tabulate(table, headers=headers, tablefmt="grid")

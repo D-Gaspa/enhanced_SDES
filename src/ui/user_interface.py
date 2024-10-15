@@ -70,7 +70,7 @@ class UserInterface:
         self.enhanced_sdes.show_progress = show_progress
         ciphertext = self.enhanced_sdes.encrypt(message, sdes_key, trans_key, rounds)
 
-        print(f"\nEncrypted message (hex): {ciphertext}")
+        print(f"Encrypted message (hex): {ciphertext}")
         self._save_info(message, ciphertext, sdes_key, trans_key, column_size, rounds)
 
     def _decrypt_process(self) -> None:

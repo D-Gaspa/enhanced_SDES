@@ -7,6 +7,8 @@ of the Columnar Transposition technique, which is used as part of the enhanced S
 import math
 from typing import List
 
+from utils.utilities import Utilities
+
 
 class ColumnTransposition:
     """
@@ -18,38 +20,60 @@ class ColumnTransposition:
     """
     ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-    def transpose(self, text: str, key: List[int], rounds: int = 1) -> str:
+    def transpose(self, text: str, key: List[int], rounds: int = 1, show_progress: bool = False) -> str:
         """
         Perform columnar transposition encryption on the input text.
 
         Args:
-            text:   The text to be encrypted.
-            key:    A list of integers representing the column order.
-            rounds: The number of rounds of transposition to perform.
+            text:           The text to be encrypted.
+            key:            A list of integers representing the column order.
+            rounds:         The number of rounds of transposition to perform.
+            show_progress:  If True, intermediate steps will be printed.
 
         Returns:
             The encrypted text after columnar transposition.
         """
+        num_columns = len(key)
         text = self._prepare_text(text, len(key))
-        for _ in range(rounds):
+
+        if show_progress:
+            print("Initial Table:")
+            print(Utilities.create_table(text, num_columns))
+
+        for round_num in range(rounds):
             text = self._single_round_transpose(text, key)
+            if show_progress:
+                print(f"After round {round_num + 1}:")
+                print(Utilities.create_table(text, num_columns))
+
         return text
 
-    def inverse_transpose(self, text: str, key: List[int], rounds: int = 1) -> str:
+    def inverse_transpose(self, text: str, key: List[int], rounds: int = 1, show_progress: bool = False) -> str:
         """
         Perform columnar transposition decryption on the input text.
 
         Args:
-            text:   The text to be decrypted.
-            key:    A list of integers representing the column order.
-            rounds: The number of rounds of transposition to reverse.
+            text:           The text to be decrypted.
+            key:            A list of integers representing the column order.
+            rounds:         The number of rounds of transposition to reverse.
+            show_progress:  If True, intermediate steps will be printed.
 
         Returns:
             The decrypted text after reversing columnar transposition.
         """
         inverse_key = self._get_inverse_key(key)
-        for _ in range(rounds):
+        num_columns = len(key)
+
+        if show_progress:
+            print("Initial Table:")
+            print(Utilities.create_table(text, num_columns))
+
+        for round_num in range(rounds):
             text = self._single_round_inverse_transpose(text, inverse_key)
+            if show_progress:
+                print(f"After round {round_num + 1}:")
+                print(Utilities.create_table(text, num_columns))
+
         return text
 
     @staticmethod

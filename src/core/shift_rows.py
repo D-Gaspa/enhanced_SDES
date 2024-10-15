@@ -7,6 +7,8 @@ used in the enhanced version of the Simplified Data Encryption Standard (S-DES).
 
 from math import ceil
 
+from utils.utilities import Utilities
+
 
 class ShiftRows:
     """
@@ -18,7 +20,7 @@ class ShiftRows:
     """
 
     @staticmethod
-    def shift(text: str, num_columns: int) -> str:
+    def shift(text: str, num_columns: int, show_progress: bool = False) -> str:
         """
         Perform the Shift Rows operation on the input text.
 
@@ -29,8 +31,9 @@ class ShiftRows:
         - And so on for any additional rows
 
         Args:
-            text: A string of characters to be arranged in a matrix and shifted.
-            num_columns: The number of columns in the matrix.
+            text:           A string of characters to be arranged in a matrix and shifted.
+            num_columns:    The number of columns in the matrix.
+            show_progress:  If True, intermediate steps will be printed.
 
         Returns:
             A string of characters after the shift operation.
@@ -38,13 +41,23 @@ class ShiftRows:
         num_rows = ceil(len(text) / num_columns)
         matrix = [list(text[i:i + num_columns].ljust(num_columns)) for i in range(0, len(text), num_columns)]
 
+        if show_progress:
+            print("Before Shift:")
+            print(Utilities.create_table(''.join(''.join(row).rstrip() for row in matrix), num_columns))
+
         for i in range(1, num_rows):
             matrix[i] = matrix[i][i:] + matrix[i][:i]
 
-        return ''.join(''.join(row).rstrip() for row in matrix)
+        result = ''.join(''.join(row).rstrip() for row in matrix)
+
+        if show_progress:
+            print("After Shift:")
+            print(Utilities.create_table(result, num_columns))
+
+        return result
 
     @staticmethod
-    def inverse_shift(text: str, num_columns: int) -> str:
+    def inverse_shift(text: str, num_columns: int, show_progress: bool = False) -> str:
         """
         Perform the inverse Shift Rows operation on the input text.
 
@@ -55,8 +68,9 @@ class ShiftRows:
         - And so on for any additional rows
 
         Args:
-            text: A string of characters to be arranged in a matrix and inverse shifted.
-            num_columns: The number of columns in the matrix.
+            text:           A string of characters to be arranged in a matrix and inverse shifted.
+            num_columns:    The number of columns in the matrix.
+            show_progress:  If True, intermediate steps will be printed.
 
         Returns:
             A string of characters after the inverse shift operation.
@@ -64,7 +78,17 @@ class ShiftRows:
         num_rows = ceil(len(text) / num_columns)
         matrix = [list(text[i:i + num_columns].ljust(num_columns)) for i in range(0, len(text), num_columns)]
 
+        if show_progress:
+            print("Before Inverse Shift:")
+            print(Utilities.create_table(''.join(''.join(row).rstrip() for row in matrix), num_columns))
+
         for i in range(1, num_rows):
             matrix[i] = matrix[i][-i:] + matrix[i][:-i]
 
-        return ''.join(''.join(row).rstrip() for row in matrix)
+        result = ''.join(''.join(row).rstrip() for row in matrix)
+
+        if show_progress:
+            print("After Inverse Shift:")
+            print(Utilities.create_table(result, num_columns))
+
+        return result
