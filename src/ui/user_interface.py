@@ -67,7 +67,7 @@ class UserInterface:
         show_progress = input("Show encryption progress? (y/n): ").lower() == 'y'
         print("Encrypting ...\n")
 
-        self.enhanced_sdes.show_progress = show_progress
+        self.enhanced_sdes.set_show_progress(show_progress)
         ciphertext = self.enhanced_sdes.encrypt(message, sdes_key, trans_key, rounds)
 
         print(f"Encrypted message (hex): {ciphertext}")

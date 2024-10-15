@@ -17,10 +17,21 @@ class ShiftRows:
     This class provides methods for shifting rows of a matrix of characters,
     as well as the inverse operation.
     It is used as part of the enhanced S-DES algorithm and can handle matrices of various sizes.
+
+    Attributes:
+        show_progress:  A boolean indicating whether to show intermediate steps.
     """
 
-    @staticmethod
-    def shift(text: str, num_columns: int, show_progress: bool = False) -> str:
+    def __init__(self, show_progress: bool = False):
+        """
+        Initialize the ShiftRows instance.
+
+        Args:
+            show_progress: If True, intermediate steps will be printed.
+        """
+        self.show_progress = show_progress
+
+    def shift(self, text: str, num_columns: int) -> str:
         """
         Perform the Shift Rows operation on the input text.
 
@@ -33,7 +44,6 @@ class ShiftRows:
         Args:
             text:           A string of characters to be arranged in a matrix and shifted.
             num_columns:    The number of columns in the matrix.
-            show_progress:  If True, intermediate steps will be printed.
 
         Returns:
             A string of characters after the shift operation.
@@ -41,7 +51,7 @@ class ShiftRows:
         num_rows = ceil(len(text) / num_columns)
         matrix = [list(text[i:i + num_columns].ljust(num_columns)) for i in range(0, len(text), num_columns)]
 
-        if show_progress:
+        if self.show_progress:
             print("Before Shift:")
             print(Utilities.create_table(''.join(''.join(row).rstrip() for row in matrix), num_columns))
 
@@ -50,14 +60,13 @@ class ShiftRows:
 
         result = ''.join(''.join(row).rstrip() for row in matrix)
 
-        if show_progress:
+        if self.show_progress:
             print("After Shift:")
             print(Utilities.create_table(result, num_columns))
 
         return result
 
-    @staticmethod
-    def inverse_shift(text: str, num_columns: int, show_progress: bool = False) -> str:
+    def inverse_shift(self, text: str, num_columns: int) -> str:
         """
         Perform the inverse Shift Rows operation on the input text.
 
@@ -70,7 +79,6 @@ class ShiftRows:
         Args:
             text:           A string of characters to be arranged in a matrix and inverse shifted.
             num_columns:    The number of columns in the matrix.
-            show_progress:  If True, intermediate steps will be printed.
 
         Returns:
             A string of characters after the inverse shift operation.
@@ -78,7 +86,7 @@ class ShiftRows:
         num_rows = ceil(len(text) / num_columns)
         matrix = [list(text[i:i + num_columns].ljust(num_columns)) for i in range(0, len(text), num_columns)]
 
-        if show_progress:
+        if self.show_progress:
             print("Before Inverse Shift:")
             print(Utilities.create_table(''.join(''.join(row).rstrip() for row in matrix), num_columns))
 
@@ -87,7 +95,7 @@ class ShiftRows:
 
         result = ''.join(''.join(row).rstrip() for row in matrix)
 
-        if show_progress:
+        if self.show_progress:
             print("After Inverse Shift:")
             print(Utilities.create_table(result, num_columns))
 
