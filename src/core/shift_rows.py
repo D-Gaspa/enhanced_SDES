@@ -7,6 +7,7 @@ used in the enhanced version of the Simplified Data Encryption Standard (S-DES).
 
 from math import ceil
 
+from utils.progress_level import ProgressLevel
 from utils.utilities import Utilities
 
 
@@ -19,17 +20,23 @@ class ShiftRows:
     It is used as part of the enhanced S-DES algorithm and can handle matrices of various sizes.
 
     Attributes:
-        show_progress:  A boolean indicating whether to show intermediate steps.
+        progress_level: The level of detail to show during the shift operation.
     """
 
-    def __init__(self, show_progress: bool = False):
+    def __init__(self):
         """
         Initialize the ShiftRows instance.
+        """
+        self.progress_level = ProgressLevel.NONE
+
+    def set_progress_level(self, level: ProgressLevel) -> None:
+        """
+        Set the progress level for the Shift Rows operation.
 
         Args:
-            show_progress: If True, intermediate steps will be printed.
+            level: The progress level to set.
         """
-        self.show_progress = show_progress
+        self.progress_level = level
 
     def shift(self, text: str, num_columns: int) -> str:
         """
@@ -51,7 +58,7 @@ class ShiftRows:
         num_rows = ceil(len(text) / num_columns)
         matrix = [list(text[i:i + num_columns].ljust(num_columns)) for i in range(0, len(text), num_columns)]
 
-        if self.show_progress:
+        if self.progress_level == ProgressLevel.DETAILED:
             print("Before Shift:")
             print(Utilities.create_table(''.join(''.join(row).rstrip() for row in matrix), num_columns))
 
@@ -60,7 +67,7 @@ class ShiftRows:
 
         result = ''.join(''.join(row).rstrip() for row in matrix)
 
-        if self.show_progress:
+        if self.progress_level == ProgressLevel.DETAILED:
             print("After Shift:")
             print(Utilities.create_table(result, num_columns))
 
@@ -86,7 +93,7 @@ class ShiftRows:
         num_rows = ceil(len(text) / num_columns)
         matrix = [list(text[i:i + num_columns].ljust(num_columns)) for i in range(0, len(text), num_columns)]
 
-        if self.show_progress:
+        if self.progress_level == ProgressLevel.DETAILED:
             print("Before Inverse Shift:")
             print(Utilities.create_table(''.join(''.join(row).rstrip() for row in matrix), num_columns))
 
@@ -95,7 +102,7 @@ class ShiftRows:
 
         result = ''.join(''.join(row).rstrip() for row in matrix)
 
-        if self.show_progress:
+        if self.progress_level == ProgressLevel.DETAILED:
             print("After Inverse Shift:")
             print(Utilities.create_table(result, num_columns))
 

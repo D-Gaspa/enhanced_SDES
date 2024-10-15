@@ -9,6 +9,7 @@ from typing import List, Tuple
 
 from core.enhanced_sdes import EnhancedSDES
 from utils.key_manager import KeyManager
+from utils.progress_level import ProgressLevel
 
 
 class UserInterface:
@@ -38,12 +39,14 @@ class UserInterface:
         """
         print("Welcome to the Enhanced S-DES Encryption System!")
         while True:
-            choice = input("\nEnter 1 to encrypt, 2 to decrypt, or 3 to exit: ").lower()
+            choice = input("\nEnter 1 to encrypt, 2 to decrypt, 3 to change progress level, or 4 to exit: ").lower()
             if choice == '1':
                 self._encrypt_process()
             elif choice == '2':
                 self._decrypt_process()
             elif choice == '3':
+                self._set_progress_level()
+            elif choice == '4':
                 print("Exiting the program. Goodbye!")
                 break
             else:
@@ -64,10 +67,6 @@ class UserInterface:
 
         rounds = int(input("Enter the number of transposition rounds (or press Enter for default 2): ") or 2)
 
-        show_progress = input("Show encryption progress? (y/n): ").lower() == 'y'
-        print("Encrypting ...\n")
-
-        self.enhanced_sdes.set_show_progress(show_progress)
         ciphertext = self.enhanced_sdes.encrypt(message, sdes_key, trans_key, rounds)
 
         print(f"Encrypted message (hex): {ciphertext}")
@@ -90,13 +89,29 @@ class UserInterface:
             trans_key, _ = self._get_transposition_key()
             rounds = int(input("Enter the number of transposition rounds: "))
 
-        show_progress = input("Show decryption progress? (y/n): ").lower() == 'y'
-        print("Decrypting ...\n")
-
-        self.enhanced_sdes.show_progress = show_progress
         plaintext = self.enhanced_sdes.decrypt(ciphertext, sdes_key, trans_key, rounds)
 
         print(f"Decrypted message: {plaintext}")
+
+    def _set_progress_level(self):
+        """
+        Set the progress level for the Enhanced S-DES system and its components.
+        The progress level determines the amount of detail displayed during encryption/decryption.
+
+        The progress level can be set to:
+        - 0: None (no progress information displayed)
+        - 1: Normal (basic progress information displayed)
+        - 2: Detailed (detailed progress information displayed)
+        """
+        while True:
+            level = input("Enter progress level (0: None, 1: Normal, 2: Detailed): ")
+            if level in ['0', '1', '2']:
+                self.progress_level = ProgressLevel(int(level))
+                self.enhanced_sdes.set_progress_level(self.progress_level)
+                print(f"Progress level set to: {self.progress_level.name}")
+                break
+            else:
+                print("Invalid input. Please enter 0, 1, or 2.")
 
     def _get_sdes_key(self) -> str:
         """

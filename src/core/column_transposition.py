@@ -7,6 +7,7 @@ of the Columnar Transposition technique, which is used as part of the enhanced S
 import math
 from typing import List
 
+from utils.progress_level import ProgressLevel
 from utils.utilities import Utilities
 
 
@@ -21,18 +22,24 @@ class ColumnTransposition:
     Attributes:
         ALPHABET: A string containing the uppercase alphabet.
 
-        show_progress: A boolean indicating whether to show intermediate steps.
+        progress_level: The level of detail to show during the transposition process.
     """
     ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-    def __init__(self, show_progress: bool = False):
+    def __init__(self):
         """
         Initialize the ColumnTransposition instance.
+        """
+        self.progress_level = ProgressLevel.NONE
+
+    def set_progress_level(self, level: ProgressLevel) -> None:
+        """
+        Set the progress level for the Columnar Transposition cipher.
 
         Args:
-            show_progress: If True, intermediate steps will be printed.
+            level: The progress level to set.
         """
-        self.show_progress = show_progress
+        self.progress_level = level
 
     def transpose(self, text: str, key: List[int], rounds: int = 1) -> str:
         """
@@ -49,13 +56,13 @@ class ColumnTransposition:
         num_columns = len(key)
         text = self._prepare_text(text, len(key))
 
-        if self.show_progress:
+        if self.progress_level == ProgressLevel.DETAILED:
             print("Initial Table:")
             print(Utilities.create_table(text, num_columns))
 
         for round_num in range(rounds):
             text = self._single_round_transpose(text, key)
-            if self.show_progress:
+            if self.progress_level == ProgressLevel.DETAILED:
                 print(f"After round {round_num + 1}:")
                 print(Utilities.create_table(text, num_columns))
 
@@ -76,13 +83,13 @@ class ColumnTransposition:
         inverse_key = self._get_inverse_key(key)
         num_columns = len(key)
 
-        if self.show_progress:
+        if self.progress_level == ProgressLevel.DETAILED:
             print("Initial Table:")
             print(Utilities.create_table(text, num_columns))
 
         for round_num in range(rounds):
             text = self._single_round_inverse_transpose(text, inverse_key)
-            if self.show_progress:
+            if self.progress_level == ProgressLevel.DETAILED:
                 print(f"After round {round_num + 1}:")
                 print(Utilities.create_table(text, num_columns))
 

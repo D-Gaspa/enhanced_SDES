@@ -12,6 +12,7 @@ from core.column_transposition import ColumnTransposition
 from core.sdes import SDES
 from core.shift_rows import ShiftRows
 from utils.key_manager import KeyManager
+from utils.progress_level import ProgressLevel
 from utils.utilities import Utilities
 
 
@@ -23,37 +24,35 @@ class EnhancedSDES:
     shift rows operations to provide a more secure encryption scheme.
 
     Attributes:
-        show_progress:  A boolean indicating whether to show intermediate steps.
+        progress_level: The level of detail to show during encryption/decryption.
         transposition:  An instance of ColumnTransposition.
         shift_rows:     An instance of ShiftRows.
         sdes:           An instance of SDES.
         key_manager:    An instance of KeyManager.
     """
 
-    def __init__(self, show_progress: bool = False):
+    def __init__(self):
         """
         Initialize the EnhancedSDES instance.
 
-        Args:
-            show_progress: If True, intermediate steps will be printed.
         """
-        self.show_progress = show_progress
+        self.progress_level = ProgressLevel.NONE
         self.transposition = ColumnTransposition()
         self.shift_rows = ShiftRows()
         self.sdes = SDES()
         self.key_manager = KeyManager()
 
-    def set_show_progress(self, show_progress: bool) -> None:
+    def set_progress_level(self, level: ProgressLevel) -> None:
         """
-        Set the show_progress attribute.
+        Set the progress level for the Enhanced S-DES algorithm and its components.
 
         Args:
-            show_progress: A boolean indicating whether to show intermediate steps.
+            level: The progress level to set.
         """
-        self.show_progress = show_progress
-        self.transposition.show_progress = show_progress
-        self.shift_rows.show_progress = show_progress
-        self.sdes.show_progress = show_progress
+        self.progress_level = level
+        self.transposition.set_progress_level(level)
+        self.shift_rows.set_progress_level(level)
+        self.sdes.set_progress_level(level)
 
     def encrypt(self, plaintext: str, sdes_key: str, trans_key: List[int], rounds: int) -> str:
         """
@@ -68,29 +67,29 @@ class EnhancedSDES:
         Returns:
             The encrypted ciphertext.
         """
-        if self.show_progress:
+        if self.progress_level != ProgressLevel.NONE:
             print(f"Plaintext: {plaintext}\n")
 
         # Step 1: Columnar Transposition
         transposed = self.transposition.transpose(plaintext, trans_key, rounds)
-        if self.show_progress:
+        if self.progress_level != ProgressLevel.NONE:
             print(f"\nColumnar Transposition: {transposed}")
 
         # Step 2: Shift Rows
         shifted = self.shift_rows.shift(transposed, len(trans_key))
-        if self.show_progress:
+        if self.progress_level != ProgressLevel.NONE:
             print(f"\nShift Rows: {shifted}")
 
         # Step 3: S-DES Encryption
         binary = Utilities.text_to_binary(shifted)
-        if self.show_progress:
+        if self.progress_level != ProgressLevel.NONE:
             print(f"\nConverted to binary: {binary}")
 
         encrypted_binary = self._apply_sdes(binary, sdes_key, encrypt=True)
 
         cipher_text = Utilities.binary_to_hex(encrypted_binary)
 
-        if self.show_progress:
+        if self.progress_level != ProgressLevel.NONE:
             print(f"\nS-DES Encryption (hex): {cipher_text}\n")
 
         return cipher_text
@@ -108,19 +107,25 @@ class EnhancedSDES:
         Returns:
             The decrypted plaintext.
         """
-        if self.show_progress:
+        if self.progress_level != ProgressLevel.NONE:
             print(f"Ciphertext: {ciphertext}")
 
         # Step 1: S-DES Decryption
         binary = Utilities.hex_to_binary(ciphertext)
+        if self.progress_level != ProgressLevel.NONE:
+            print(f"\nConverted to binary: {binary}")
+
         decrypted_binary = self._apply_sdes(binary, sdes_key, encrypt=False)
+        if self.progress_level != ProgressLevel.NONE:
+            print(f"\nS-DES Decryption (binary): {decrypted_binary}")
+
         text = Utilities.binary_to_text(decrypted_binary)
-        if self.show_progress:
-            print(f"\nS-DES Decryption: {text}")
+        if self.progress_level != ProgressLevel.NONE:
+            print(f"\nConverted to text: {text}")
 
         # Step 2: Inverse Shift Rows
         unshifted = self.shift_rows.inverse_shift(text, len(trans_key))
-        if self.show_progress:
+        if self.progress_level != ProgressLevel.NONE:
             print(f"\nInverse Shift Rows: {unshifted}\n")
 
         # Step 3: Inverse Columnar Transposition
@@ -144,7 +149,7 @@ class EnhancedSDES:
         total_blocks = len(binary) // 8
         operation = "Encrypting" if encrypt else "Decrypting"
 
-        if self.show_progress:
+        if self.progress_level == ProgressLevel.DETAILED:
             print(f"\n{operation} with S-DES:")
             print(f"Total blocks to process: {total_blocks}")
             print(f"Key: {key}")
@@ -153,7 +158,7 @@ class EnhancedSDES:
             block = binary[i:i + 8]
             block_number = i // 8 + 1
 
-            if self.show_progress:
+            if self.progress_level == ProgressLevel.DETAILED:
                 print(f"\n{operation} block {block_number}/{total_blocks}")
                 print(f"Input block: {block}")
 
@@ -164,11 +169,11 @@ class EnhancedSDES:
 
             result += processed_block
 
-            if self.show_progress:
+            if self.progress_level == ProgressLevel.DETAILED:
                 print(f"Output block: {processed_block}")
                 print(f"Current result: {result}")
 
-        if self.show_progress:
+        if self.progress_level == ProgressLevel.DETAILED:
             print(f"\nFinal {operation.lower()[:-3]}ed result: {result}")
 
         return result
