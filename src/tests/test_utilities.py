@@ -43,3 +43,7 @@ class TestUtilities(unittest.TestCase):
         binary = self.utilities.text_to_binary(original_text)
         decoded_text = self.utilities.binary_to_text(binary)
         self.assertEqual(original_text, decoded_text)
+
+
+if __name__ == '__main__':
+    unittest.main()

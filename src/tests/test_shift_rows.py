@@ -79,3 +79,7 @@ class TestShiftRows(unittest.TestCase):
         shifted = self.sr.shift(original, num_columns)
         result = self.sr.inverse_shift(shifted, num_columns)
         self.assertEqual(result, original)
+
+
+if __name__ == '__main__':
+    unittest.main()

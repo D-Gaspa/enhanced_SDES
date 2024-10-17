@@ -73,3 +73,7 @@ class TestSDES(unittest.TestCase):
             ciphertext = self.sdes.encrypt(plaintext, key)
             decrypted = self.sdes.decrypt(ciphertext, key)
             self.assertEqual(plaintext, decrypted)
+
+
+if __name__ == '__main__':
+    unittest.main()

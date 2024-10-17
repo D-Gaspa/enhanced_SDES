@@ -131,7 +131,7 @@ class EnhancedSDES:
         # Step 3: Inverse Columnar Transposition
         plaintext = self.transposition.inverse_transpose(unshifted, trans_key, rounds)
 
-        return plaintext.rstrip()
+        return plaintext
 
     def _apply_sdes(self, binary: str, key: str, encrypt: bool) -> str:
         """

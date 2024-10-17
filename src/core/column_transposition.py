@@ -91,7 +91,7 @@ class ColumnTransposition:
                 print(f"After round {round_num + 1}:")
                 print(Utilities.create_table(text, num_columns))
 
-        return text
+        return text.strip()
 
     @staticmethod
     def _prepare_text(text: str, num_columns: int) -> str:
@@ -105,7 +105,6 @@ class ColumnTransposition:
         Returns:
             The prepared text with spaces removed and padding added.
         """
-        text = ''.join(text.split()).upper()  # Remove spaces and convert to uppercase
         padding_length = -len(text) % num_columns
         if padding_length > 0:
             padding = ' ' * padding_length

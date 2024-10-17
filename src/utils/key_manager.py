@@ -15,9 +15,14 @@ class KeyManager:
 
     This class provides methods for generating keys for the S-DES algorithm
     and the columnar transposition technique used in the enhanced version.
+
+    Attributes:
+        MIN_COLUMNS (int):      The minimum number of columns for transposition.
+        MAX_COLUMNS (int):      The maximum number of columns for transposition.
+        DEFAULT_COLUMNS (int):  The default number of columns for transposition.
     """
     MIN_COLUMNS = 2
-    MAX_COLUMNS = 26  # Maximum number of columns (alphabet size)
+    MAX_COLUMNS = 10
     DEFAULT_COLUMNS = 3
 
     @staticmethod

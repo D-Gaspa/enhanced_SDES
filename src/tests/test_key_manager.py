@@ -38,3 +38,7 @@ class TestKeyManager(unittest.TestCase):
             self.key_manager.generate_transposition_key(1)
         with self.assertRaises(ValueError):
             self.key_manager.generate_transposition_key(27)
+
+
+if __name__ == '__main__':
+    unittest.main()
