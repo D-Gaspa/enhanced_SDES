@@ -68,7 +68,7 @@ class EnhancedSDES:
             The encrypted ciphertext.
         """
         if self.progress_level != ProgressLevel.NONE:
-            print(f"Plaintext: {plaintext}\n")
+            print(f"Plaintext: {plaintext}")
 
         # Step 1: Columnar Transposition
         transposed = self.transposition.transpose(plaintext, trans_key, rounds)
